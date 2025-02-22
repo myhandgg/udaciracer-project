@@ -2,11 +2,11 @@
 
 // The store will hold all information needed globally
 let store = {
-	track_id: undefined,
-	track_name: undefined,
-	player_id: undefined,
-	player_name: undefined,
-	race_id: undefined,
+	track_id: 11,
+	track_name: "raze",
+	player_id: 1,
+	player_name: "Eslam",
+	race_id: 12,
 }
 
 // We need our javascript to wait until the DOM is loaded
@@ -91,18 +91,24 @@ async function handleCreateRace() {
 	// render starting UI
 	renderAt('#race', renderRaceStartView(store.track_name))
 
-	// TODO - Get player_id and track_id from the store
-	
-	// const race = TODO - call the asynchronous method createRace, passing the correct parameters
+	// TODO - Get player_id and track_id from the store 
+	// DONE
+	const player_id = store.player_id
+	const track_id = store.track_id
 
+	// TODO - call the asynchronous method createRace, passing the correct parameters
+	// DONE
+	const race = await createRace(player_id, track_id) 
+
+	console.log(race)
 	// TODO - update the store with the race id in the response
 	// TIP - console logging API responses can be really helpful to know what data shape you received
 	console.log("RACE: ", race)
-	// store.race_id = 
+	store.race_id = race.ID
 	
 	// The race has been created, now start the countdown
 	// TODO - call the async function runCountdown
-
+	await runCountdown()
 	// TODO - call the async function startRace
 	// TIP - remember to always check if a function takes parameters before calling it!
 
@@ -138,10 +144,15 @@ async function runCountdown() {
 
 		return new Promise(resolve => {
 			// TODO - use Javascript's built in setInterval method to count down once per second
-
-			// run this DOM manipulation inside the set interval to decrement the countdown for the user
-			document.getElementById('big-numbers').innerHTML = --timer
-
+			const interval = setInterval(() => {
+				// run this DOM manipulation inside the set interval to decrement the countdown for the user
+				document.getElementById('big-numbers').innerHTML = --timer
+				console.log(document.getElementById('big-numbers').innerHTML)
+				if (+document.getElementById('big-numbers').innerHTML === 0) {
+					resolve()
+					clearInterval(interval)
+				}
+			}, 1000);
 			// TODO - when the setInterval timer hits 0, clear the interval, resolve the promise, and return
 
 		})
@@ -338,13 +349,21 @@ function getTracks() {
 
 	// TODO: Fetch tracks
 	// TIP: Don't forget a catch statement!
+	// DONE
+	return fetch(`${SERVER}/api/tracks`)
+	.then(res => res.json())
+	.catch(err => console.log(err.message))
 }
 
 function getRacers() {
 	// GET request to `${SERVER}/api/cars`
-
+	
 	// TODO: Fetch racers
 	// TIP: Do a file search for "TODO" to make sure you find all the things you need to do! There are even some vscode plugins that will highlight todos for you
+	// DONE
+	return fetch(`${SERVER}/api/cars`)
+	.then(res => res.json())
+	.catch(err => console.log(err.message))
 }
 
 function createRace(player_id, track_id) {
